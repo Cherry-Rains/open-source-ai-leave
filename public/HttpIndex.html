@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>AI请假助手</title>
+    <script src="/jquery.min.js"></script>
+    <style>
+        /* 确保所有元素使用 border-box 模型 */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', Arial, sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: row;
+            align-items: stretch;
+            background-image: url('image/backImage.jpg');
+            color: #333;
+            box-sizing: border-box;
+            overflow: hidden; /* 隐藏多余内容 */
+        }
+
+        #chat-box {
+            flex-grow: 1;
+            overflow-y: auto;
+            border-radius: 10px;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 1.0); /* 半透明白色 */
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+            margin-bottom: 10px;
+        }
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #FAFAFA;
+            border-radius: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 20px;
+            overflow: hidden; /* 隐藏多余内容 */
+            background-color: rgba(255, 255, 255, 0.7); /* 半透明白色 */
+            max-width: 100%; /* 调整最大宽度 */
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: #444;
+            background-color: #FFFFFF;
+            border-bottom: 2px solid #E0E0E0;
+            width: 100%;
+            height: 60px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .data-div {
+            flex-grow: 1;
+            flex-shrink: 1; /* 允许元素缩小 */
+            flex-basis: auto; /* 根据内容自适应大小 */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 10px;
+            width: 100%;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+
+        #output {
+            flex-grow: 1;
+            overflow-y: auto;
+            border-radius: 10px;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 1.0); /* 半透明白色 */
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+            margin-bottom: 10px;
+        }
+
+        .input-container {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        #user-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #DDD;
+            border-radius: 20px;
+            font-size: 16px;
+            resize: none;
+            outline: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            background-color: rgba(255, 255, 255, 1.0); /* 半透明白色 */
+        }
+
+        #send-button {
+            width: 40px;
+            height: 40px;
+            margin-left: 10px;
+            cursor: pointer;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            opacity: 0.8;
+        }
+
+        #send-button:hover {
+            transform: scale(1.1);
+            opacity: 1;
+        }
+
+        .icon {
+            margin-top: 15px;
+            width: 100%;
+            height: 100px;
+            position: relative;
+            text-align: center;
+            color: white;
+        }
+
+        .icon::after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: -10px;
+            width: 50px;
+            height: 1px;
+            background-color: white;
+        }
+
+        .loading-icon {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .sidebar {
+            width: 70px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            border-radius: 10px;
+            justify-content: space-between;
+            align-items: center;
+            background-image: linear-gradient(to bottom, #93ccdb, #7fa1bc);
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar:hover {
+            width: 120px;
+        }
+
+        .sidebar-item {
+            font-size: 14px;
+            color: #ECF0F1;
+            padding: 15px 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            width: 100%;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            opacity: 0.8;
+        }
+
+        .sidebar-item img {
+            margin-bottom: 5px;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-item:hover {
+            background-color: #8ea0bd;
+            opacity: 1;
+        }
+
+        .sidebar-item:hover img {
+            transform: rotate(15deg);
+        }
+
+        .sidebar-item.selected {
+            background-color:  #8ea0bd;
+
+        }
+
+        /* 用户消息样式 */
+        .user-message {
+            display: flex;
+            align-items: flex-end;
+            justify-content: flex-end;
+            margin-bottom: 10px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .user-message .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-left: 10px;
+            background-size: cover;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            background-image: url('image/user.png');
+        }
+
+        .user-message .message-content {
+            background-color: #E0DFFF;
+            padding: 10px;
+            border-radius: 15px;
+            margin-right: 10px;
+            max-width: 70%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .user-message .message-content::after {
+            content: "";
+            position: absolute;
+            top: 10px;
+            right: -10px;
+            border-width: 10px;
+            border-style: solid;
+            border-color: transparent transparent transparent #E0DFFF;
+        }
+
+        /* 系统消息样式 */
+        .system-message {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 10px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .system-message .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+            background-size: cover;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            background-image: url('image/aislogo_blue.png');
+        }
+
+        .system-message .message-content {
+            background-color: #FFF;
+            padding: 10px;
+            border-radius: 15px;
+            max-width: 70%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .system-message .message-content::before {
+            content: "";
+            position: absolute;
+            top: 10px;
+            left: -10px;
+            border-width: 10px;
+            border-style: solid;
+            border-color: transparent #FFF transparent transparent;
+        }
+
+        .footer-note {
+            font-size: 12px;
+            text-align: center;
+            color: #8a8a8a;
+            padding: 10px;
+            border-top: 2px solid #92cada;
+            width: 100%;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 功能列表样式 */
+        .function-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #FFFFFF;
+            border-radius: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-top: 20px;
+            width: 90%;
+            box-sizing: border-box;
+        }
+
+        .function-header {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #444;
+        }
+
+        .function-list {
+            list-style: none;
+            padding: 0;
+            width: 100%;
+        }
+
+        .function-list li {
+            padding: 10px;
+            background-color: #F5F5F5;
+            margin-bottom: 5px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        #send-button {
+            width: 40px;
+            height: 40px;
+            margin-left: 10px;
+            cursor: pointer;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            opacity: 0.8;
+        }
+
+        #send-button:hover {
+            transform: scale(1.1);
+            opacity: 1;
+        }
+        .function-list li:hover {
+            background-color: #E0E0E0;
+        }
+        .modal-content {
+      background-color: #fefefe;
+      margin: 15% auto; /* 15% 从顶部 和 自动水平居中 */
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%; /* 宽度 */
+    }
+
+    /* 关闭按钮 */
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+        // 获取打开模态框的按钮
+    var btn = document.getElementById("openModal");
+
+    // 获取 <span> 元素，用于关闭模态框
+    var span = document.getElementsByClassName("close")[0];
+    </style>
+</head>
+
+<body>
+<div class="sidebar">
+    <div class="icon">
+        <img style="width:50px;height:50px" src="image/aislogo.png" alt="Logo">
+        <h1 style="font-size: 12px;color : white">AI助手</h1>
+        <h1 style="font-size: 12px;color : white">ver:1.0</h1>
+    </div>
+    <div id="sideitem" style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+        <div class="sidebar-item selected" data-item="conversation" onclick="showConversation()">
+            <img style="width:30px;height:30px" src="image/sidebar-conv.png" alt="对话窗">
+            <span>对话窗</span>
+        </div>
+        <div class="sidebar-item" data-item="function" onclick="navigateToFunction()">
+            <img style="width:30px;height:30px" src="image/sidebar_func.png" alt="功能列表">
+            <span>功能列表</span>
+        </div>
+        <div class="sidebar-item" data-item="logger" onclick="navigateToLogger()">
+            <img style="width:30px;height:30px" src="image/logger.png" alt="查询日志" >
+            <span>查询日志</span>
+        </div>
+    </div>
+    <div class="sidebar-item" data-item="aboutUs" style="margin-bottom: 20px;" onclick="showAbout()">
+        <img style="width:30px;height:30px" src="image/sidebar_about.png" alt="关于">
+        <span>关于</span>
+    </div>
+</div>
+
+<!-- 对话框容器 -->
+<div class="container" id="conversation-container">
+    <div class="header">
+        <img style="width:30px;height:30px;margin-left:10px" src="image/icon.png" alt="Logo">
+        <h1 style="margin-left: 20px; font-size: 17px">AI助手</h1>
+    </div>
+    <div class="data-div">
+        <div id="chat-box">
+            <!-- Output area -->
+        </div>
+        <div class="input-container">
+            <textarea id="user-input" placeholder="请输入您的内容，按回车键返回" onkeyup="keyupEnter(event)"></textarea>
+            <img id="send-button" src="image/inputIcon.png" alt="发送" onclick="sendMessage()">
+        </div>
+        <div class="footer-note">
+            服务生成的所有内容均由人工智能模型生成，其生成内容的准确性和完整性无法保证，不代表我们的态度或观点
+        </div>
+    </div>
+</div>
+
+</body>
+
+<script>
+    window.onload = function() {
+        appendTextToOutput('您好！我是AI请假助手，请问有什么需要帮助的？', "sys");
+    };
+
+const chatBox = document.getElementById('chat-box');
+const userInput = document.getElementById('user-input');
+const sendButton = document.getElementById('send-button');
+const userId = "UserIdXXX";
+function keyupEnter(evt) {
+    if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        sendMessage();
+    }
+}
+
+async function sendMessage() {
+    setSendIcon(true);
+    const text = document.getElementById('user-input').value.trim(); // 使用 document.getElementById 获取元素
+    if (!text) return;
+    // 添加用户消息到对话框
+    appendTextToOutput(text, "user");
+    // 调用接口
+    const response = await fetch('http://10.0.13.248:11111/wechatService', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            text: text,
+            userId: userId,
+        }),
+    });
+    const data = await response.json();
+
+    appendTextToOutput(data.content, "sys");
+
+    // 清空输入框
+    document.getElementById('user-input').value = '';
+    setSendIcon(false);
+    }
+
+
+function setSendIcon(loading) {
+    if (loading) {
+        sendButton.src = "image/loading-icon.png";
+        sendButton.classList.add("loading-icon");
+    } else {
+        sendButton.src = "image/inputIcon.png";
+        sendButton.classList.remove("loading-icon");
+    }
+}
+
+function appendTextToOutput(msg, role) {
+    let output = $("#chat-box");
+    let date = new Date();
+    let messageDiv = document.createElement('div');
+    let messageContent = document.createElement('div');
+    let avatar = document.createElement('div');
+
+    messageContent.textContent = msg;
+    messageContent.style.whiteSpace = "pre-line";
+    avatar.classList.add("avatar");
+
+    if (role === "user") {
+        messageDiv.classList.add("user-message");
+        messageContent.classList.add("message-content");
+        messageDiv.appendChild(messageContent);
+        messageDiv.appendChild(avatar);
+    } else {
+        messageDiv.classList.add("system-message");
+        messageDiv.appendChild(avatar);
+        messageDiv.appendChild(messageContent);
+        messageContent.classList.add("message-content");
+    }
+
+    output.append(messageDiv);
+    output.append("<br><br>");
+
+    $("#output").scrollTop($("#output").prop("scrollHeight"));
+}
+
+function addMessage(message, type) {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${type}-message`;
+    messageDiv.textContent = message;
+    chatBox.appendChild(messageDiv);
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+</script>
+
+</html>
