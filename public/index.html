@@ -2,16 +2,26 @@
 <html lang="">
   <head>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
-    <title><%= htmlWebpackPlugin.options.title %></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   </head>
   <body>
-    <noscript>
-      <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
-    </noscript>
     <div id="app"></div>
     <!-- built files will be auto injected -->
   </body>
 </html>
+<style>
+      .el-menu {
+        height: 100%; /* 确保 el-menu 占据 sidebar-item 的全部高度 */
+
+      }
+
+  .el-menu-item{
+    height: 70px; 
+    display: flex;
+    flex-direction: row; ;
+    background-color: #f7f7f7;
+    border-top: 0.5px solid rgba(0, 0, 0, 0.1); /* 微微的黑色 */
+
+  }
+  </style>

@@ -1,5 +1,5 @@
 <template>
-<div class="container" id="about-us" style="animation: fadeIn 0.5s ease;">
+<div class="container" id="about-us" style="background-color: red; width: 100%;">
     <div class="header">
         <h1 style=" font-size: 20px">关于我们</h1>
     </div>
@@ -21,10 +21,5 @@
   </script>
   
   <style scoped>
-  .about-container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-    text-align: center;
-  }
+
   </style>
