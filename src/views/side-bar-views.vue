@@ -1,49 +1,47 @@
 <template>
-  <div class="sidebar-content">
+  <div class="sidebar-content" style="background-image: linear-gradient(to right, #252525, #363636);box-shadow: 2px 0 5px rgba(0, 0, 0, 0.4);border-radius: 10px;">
     <el-menu
       default-active="1"
       class="el-menu-vertical-demo"
       :collapse="isCollapse"
       @open="handleOpen"
       @close="handleClose"
-      style="position: relative; transition: none;    background-color: #f7f7f7;"
+      style="position: relative;    background-color: transparent;"
     >
       <div class="sidebar-head">
         <div v-if="isCollapse" style="display: flex;flex-direction: column;">
-          <el-image :src="require('../assets/images/aislogo_blue.png')" style="width: 40px; height: 40px;"></el-image>
-          <span  style="  font-size: 10px; /* 字体大小 */
-  font-weight: bold; /* 加粗 */
-  color: black; /* 字体颜色 */">LeaveMate</span>
+          <el-image :src="require('../assets/images/fjr-icon-small.png')" style="width: 50px; height: 50px; margin-left: 5px;" ></el-image>
         </div>
         <div v-else>
-          <el-image :src="require('../assets/images/aislogo_blue.png')" style="width: 40px; height: 40px;"></el-image>
+          <el-image :src="require('../assets/images/fjr-icon.png')" style="  width: 150px;height: 70px;"></el-image>
         </div>
       </div>
-
-      <el-menu-item index="1">
-        <router-link to="/conv" style="text-decoration: none; color: inherit;">
-          <el-icon size="40"><ChatDotRound /></el-icon>
-          <span v-if="!isCollapse">对话框</span>
-        </router-link>
-      </el-menu-item>
-      <el-menu-item index="2">
-        <router-link to="/about" style="text-decoration: none; color: inherit;">
-          <el-icon size="40"><List /></el-icon>
+      <router-link to="/conv" style="text-decoration: none; color: inherit;">
+        <el-menu-item index="1" :style="{ backgroundColor: $route.path === '/conv' ? '#999' : 'transparent' }">
+          <el-icon size="40" color="white"><ChatDotRound /></el-icon>
+          <span v-if="!isCollapse" color="white">对话框</span>
+        </el-menu-item>
+      </router-link>
+      <router-link to="/about" style="text-decoration: none; color: inherit;">
+        <el-menu-item index="2" :style="{ backgroundColor: $route.path === '/about' ? '#999' : 'transparent' }">
+          <el-icon size="40" color="white"><List /></el-icon>
           <span v-if="!isCollapse">功能列表</span>
-        </router-link>
-      </el-menu-item>
-      <el-menu-item index="3">
-        <el-icon size="40"><Calendar /></el-icon>
-        <template #title><span v-if="!isCollapse">日志查询</span></template>
-      </el-menu-item>
-      <el-menu-item index="4">
-        <el-icon size="40"><Menu /></el-icon>
-        <template #title><span v-if="!isCollapse">关于我们</span></template>
+        </el-menu-item>
+      </router-link>
+      <router-link to="/logs" style="text-decoration: none; color: inherit;">
+        <el-menu-item index="3" :style="{ backgroundColor: $route.path === '/logs' ? '#999' : 'transparent' }">
+          <el-icon size="40" color="white"><Calendar /></el-icon>
+          <span v-if="!isCollapse">日志查询</span>
+        </el-menu-item>
+      </router-link>
+      <el-menu-item index="4" >
+        <el-icon size="40" color="white"><Menu /></el-icon>
+        <template #title><span v-if="!isCollapse" style="margin-bottom: 0;">关于我们</span></template>
       </el-menu-item>
 
       <!-- 悬浮箭头按钮 -->
       <div class="collapse-button" @click="toggleCollapse">
-        <el-icon size="30">
+        <el-icon size="30" style="color: black !important;">
           <template v-if="isCollapse">
             <ArrowRight />
           </template>
@@ -93,13 +91,26 @@
       .sidebar-head {
         display: flex;
         align-items: center;
-        background-color: #f7f7f7  ;
+        background-color: transparent  ;
         color: #fff;
         height: 10%; /* 设置固定高度 */
         position: relative; /* 确保侧边栏内容相对定位 */
       }
-      
-
+      .el-icon {
+        color: white !important;
+      }
+      .el-menu-item{
+      height: 70px !important; 
+      display: flex;
+      flex-direction: row; ;
+      background-color: transparent;
+      border-top: 0.3px solid rgba(155, 155, 155, 0.5); /* 微微的黑色 */
+      color: white !important;
+      text-size-adjust: 15px !important;
+      }
+      .el-menu-item.is-active {
+        background-color: #999 !important;
+      }
       .collapse-button {
         position: absolute;
         top: 50%; /* 垂直居中 */

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversation History</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
+    <link
+            rel="stylesheet"
+            as="style"
+            onload="this.rel='stylesheet'"
+            href="https://fonts.googleapis.com/css2?display=swap&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900&amp;family=Work+Sans%3Awght%40400%3B500%3B700%3B900"
+    />
+    <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <style>
+        .page-button {
+            background-color: transparent; /* 默认无颜色 */
+            color: #4a5568; /* 默认文本颜色 */
+        }
+        .page-button:hover,
+        .page-button.active-page {
+            background-color: #2d3748; /* 悬停或激活时的深灰色 */
+            color: #ffffff; /* 悬停或激活时的白色文本 */
+        }
+        .nav-button {
+            background-color: #e2e8f0; /* 默认背景颜色 */
+            color: #4a5568; /* 默认文本颜色 */
+        }
+        .nav-button:hover {
+            background-color: #cbd5e0; /* 悬停时的深灰色 */
+            color: #1a202c; /* 悬停时的深色文本 */
+        }
+        .active-page {
+            background-color: #2d3748; /* 激活页的深灰色 */
+            color: #ffffff; /* 激活页的白色文本 */
+        }
+        .search-button:hover {
+            filter: brightness(0.7); /* Darken the icon on hover */
+        }
+
+        .search-button:active {
+            filter: brightness(0.5); /* Further darken the icon when clicked */
+        }
+        input[type="text"], input[type="date"] {
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            padding: 0.5rem;
+            margin-right: 1rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+<div style='font-family: "Work Sans", "Noto Sans", sans-serif;'>
+    <div class="layout-container flex h-full grow flex-col justify-center items-center">
+        <div class="bg-white max-w-[1200px] w-full px-8 py-6 shadow-lg border border-gray-300">
+            <div class="px-40 flex flex-1 justify-center py-5">
+                <div class="layout-content-container flex flex-col max-w-[960px] flex-1">
+                    <div class="flex flex-wrap justify-between gap-3 p-4">
+                        <p class="text-[#141414] tracking-light text-[32px] font-bold leading-tight min-w-72">Conversation history</p>
+                    </div>
+                    <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
+                            <input
+                                    id="user-id-input"
+                                    placeholder="Enter User ID"
+                                    class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#141414] focus:outline-0 focus:ring-0 border-none bg-[#F0F2F5] focus:border-none h-14 placeholder:text-[#3E4D5B] p-4 text-base font-normal leading-normal"
+                                    value=""
+                            />
+                        </label>
+                    </div>
+
+                    <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
+                        <label class="flex flex-col min-w-40 flex-1">
+                            <input
+                                    id="start-time"
+                                    type="date"
+                                    placeholder="Start Time"
+                                    class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#141414] focus:outline-0 focus:ring-0 border-none bg-[#F0F2F5] focus:border-none h-14 placeholder:text-[#3E4D5B] p-4 text-base font-normal leading-normal"
+                                    value=""
+                            />
+                        </label>
+                        <label class="flex flex-col min-w-40 flex-1">
+                            <input
+                                    id="end-time"
+                                    type="date"
+                                    placeholder="End Time"
+                                    class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#141414] focus:outline-0 focus:ring-0 border-none bg-[#F0F2F5] focus:border-none h-14 placeholder:text-[#3E4D5B] p-4 text-base font-normal leading-normal"
+                                    value=""
+                            />
+                        </label>
+                    </div>
+                    <div class="px-4 py-3 @container">
+                        <div class="flex overflow-hidden rounded-xl border border-[#DBE1E6] bg-[#FFFFFF]">
+                            <table class="flex-1">
+                                <thead>
+                                <tr class="bg-[#FFFFFF]">
+                                    <th class="table-4dcba0a7-aa71-47c5-abfe-572c16288416-column-120 px-4 py-3 text-left text-[#141414] w-[400px] text-sm font-medium leading-normal">User ID</th>
+                                    <th class="table-4dcba0a7-aa71-47c5-abfe-572c16288416-column-240 px-4 py-3 text-left text-[#141414] w-[400px] text-sm font-medium leading-normal">
+                                        Session ID
+                                    </th>
+                                    <th class="table-4dcba0a7-aa71-47c5-abfe-572c16288416-column-360 px-4 py-3 text-left text-[#141414] w-[400px] text-sm font-medium leading-normal">
+                                        Detailed conversation
+                                    </th>
+                                    <th class="table-4dcba0a7-aa71-47c5-abfe-572c16288416-column-480 px-4 py-3 text-left text-[#141414] w-[400px] text-sm font-medium leading-normal">StartTime</th>
+                                    <th class="table-4dcba0a7-aa71-47c5-abfe-572c16288416-column-600 px-4 py-3 text-left text-[#141414] w-[400px] text-sm font-medium leading-normal">EndTime</th>
+                                </tr>
+                                </thead>
+                                <tbody id="data-table-body">
+                                <!-- 数据行将通过 JavaScript 动态添加 -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <style>
+                            @container(max-width:120px){.table-4dcba0a7-aa71-47c5-abfe-572c16288416-column-120{display: none;}}
+                            @container(max-width:240px){.table-4dcba0a7-aa71-47c5-abfe-572c16288416-column-240{display: none;}}
+                            @container(max-width:360px){.table-4dcba0a7-aa71-47c5-abfe-572c16288416-column-360{display: none;}}
+                            @container(max-width:480px){.table-4dcba0a7-aa71-47c5-abfe-572c16288416-column-480{display: none;}}
+                            @container(max-width:600px){.table-4dcba0a7-aa71-47c5-abfe-572c16288416-column-600{display: none;}}
+                        </style>
+                    </div>
+                    <div class="flex justify-center py-4">
+                        <button id="prev-page" class="nav-button px-4 py-2 rounded mx-1">上一页</button>
+                        <button id="page-1" class="page-button px-4 py-2 rounded mx-1">1</button>
+                        <button id="page-2" class="page-button px-4 py-2 rounded mx-1">2</button>
+                        <button id="page-3" class="page-button px-4 py-2 rounded mx-1">3</button>
+                        <button id="next-page" class="nav-button px-4 py-2 rounded mx-1">下一页</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <script>
+        let currentPage = 1;
+        const rowsPerPage = 7;
+        let sessions = [];
+        let filteredData = []; // 定义在全局作用域
+
+        document.addEventListener('DOMContentLoaded', function() {
+                const userIdInput = document.getElementById('user-id-input');
+                const startTimeInput = document.getElementById('start-time');
+                const endTimeInput = document.getElementById('end-time');
+                const prevPageButton = document.getElementById('prev-page');
+                const nextPageButton = document.getElementById('next-page');
+                const pageButtons = document.querySelectorAll('.page-button');
+
+
+                function fetchData() {
+                fetch('http://localhost:24680/all-sessions')
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Fetched data:', data);
+                        const userId = userIdInput.value.trim().toLowerCase();
+                        const startTime = new Date(startTimeInput.value);
+                        const endTime = new Date(endTimeInput.value);
+
+                        filteredData = data.filter(item => {
+                            const itemStartTime = new Date(item.starttime);
+                            const itemEndTime = new Date(item.endtime);
+                            const matchesUserId = userId === '' || item.user_id.toLowerCase().includes(userId);
+                            const matchesStartTime = isNaN(startTime.getTime()) || itemStartTime >= startTime;
+                            const matchesEndTime = isNaN(endTime.getTime()) || itemEndTime <= endTime;
+                            return matchesUserId && matchesStartTime && matchesEndTime;
+                        });
+                        console.log('Filtered data length:', filteredData.length);  // 检查过滤后的数据量
+                        displayPage(currentPage);
+                    })
+                    .catch(error => console.error('Error fetching data:', error));
+            }
+
+                function displayPage(page) {
+                    const startIndex = (page - 1) * rowsPerPage;
+                    const endIndex = Math.min(startIndex + rowsPerPage, filteredData.length);
+                    const tableBody = document.getElementById('data-table-body');
+                    tableBody.innerHTML = '';
+
+                    console.log('Displaying data from index', startIndex, 'to', endIndex);
+
+                    for (let i = startIndex; i < endIndex; i++) {
+                        const row = filteredData[i];
+                        const tableRow = document.createElement('tr');
+                        tableRow.innerHTML = `
+                            <td class="px-4 py-3 text-[#141414] text-sm font-medium">${row.user_id}</td>
+                            <td class="px-4 py-3 text-[#141414] text-sm font-medium">${row.session_id}</td>
+                            <td class="px-4 py-3 text-[#141414] text-sm font-medium"><a href="detailed_conversation.html?session_id=${row.session_id}" class="text-blue-500">View Details</a></td>
+                            <td class="px-4 py-3 text-[#141414] text-sm font-medium">${row.starttime}</td>
+                            <td class="px-4 py-3 text-[#141414] text-sm font-medium">${row.endtime}</td>
+                        `;
+                        tableBody.appendChild(tableRow);
+                    }
+
+                    updatePagination();
+                }
+
+                function updatePagination() {
+                    pageButtons.forEach((button, index) => {
+                        const page = index + 1;
+                        if (page === currentPage) {
+                            button.classList.add('active-page');
+                        } else {
+                            button.classList.remove('active-page');
+                        }
+
+                        button.onclick = function() {
+                            currentPage = page;
+                            displayPage(currentPage);
+                        };
+                    });
+
+                    prevPageButton.onclick = function() {
+                        if (currentPage > 1) {
+                            currentPage--;
+                            displayPage(currentPage);
+                        }
+                    };
+
+                    nextPageButton.onclick = function() {
+                        const maxPage = Math.ceil(filteredData.length / rowsPerPage);
+                        if (currentPage < maxPage) {
+                            currentPage++;
+                            displayPage(currentPage);
+                        }
+                    };
+                }
+
+                // 监听用户ID和时间输入变化
+                userIdInput.addEventListener('input', fetchData);
+                startTimeInput.addEventListener('change', fetchData);
+                endTimeInput.addEventListener('change', fetchData);
+
+                // 初始加载时获取数据
+                fetchData();
+            });
+    </script>
+</div>
+</div>
+</body>
+</html>

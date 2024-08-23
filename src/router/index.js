@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 // 导入对应的组件
 import ConvComponent from '../views/HttpIndex.vue';
 import  AboutComponent from '../views/about-us.vue';
+import LoggerComponent from '../views/logger-views.vue';
 
 // 定义路由规则
 const routes = [
@@ -15,7 +16,14 @@ const routes = [
     path:'/about',
     name:'about',
     component: AboutComponent
-  }
+  },
+  {
+    path: '/logs',
+    name: 'logger',
+    component: LoggerComponent
+  },
+
+  
 ];
 
 // 创建路由实例

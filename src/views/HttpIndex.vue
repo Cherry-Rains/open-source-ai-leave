@@ -3,10 +3,10 @@
     <div class="header">
       <img style="width:30px;height:30px;margin-left:10px" src="../assets/images/aislogo_blue.png" alt="Logo" />
       <div style="margin-left: 10px;">
-        <span style="margin-left: 20px; font-size: 16px;margin-left: 0;margin-left: 3px;">AI助手</span>
+        <strong><span style="margin-left: 20px; font-size: 16px;margin-left: 0;margin-left: 3px;color: white;">AI助手</span></strong>
         <div style="display: flex;flex-direction: row;  text-align: center;align-items: center;justify-content: center;">
           <el-icon><Opportunity /></el-icon>
-          <span style="margin-left: 5px; font-size: 12px;">ver 1.0</span>
+          <span style="margin-left: 5px; font-size: 12px;color: white;">ver 1.0</span>
         </div> 
       </div>
       
@@ -49,7 +49,7 @@
       <div class="input-container">
       <el-input
         v-model="textarea"
-        maxlength="199"
+        maxlength="99"
         type="textarea"
         placeholder="请在此处输入您想输入的内容..."
         @keydown.enter="sendMessage"
@@ -80,7 +80,6 @@ import { Loading,Promotion } from '@element-plus/icons-vue';
 export default {
   name: 'AiAssistant',
   components: {
-   
     Loading,
   },
   setup() {
@@ -90,7 +89,8 @@ export default {
     const isLoading = ref(false);
     const userAvatar = require('../assets/images/user.png'); // 用户头像路径
     const systemAvatar = require('../assets/images/aislogo_blue.png'); // 系统头像路径
-    
+    const timestamp = new Date().toLocaleTimeString(); // 获取当前时间戳
+    messages.value.push({ text: "用户您好！我是InCar公司的AI助手LeaveMate，请问有什么可以帮您的？", isUser: false, timestamp });
     const sendMessage = async () => {
   if (textarea.value.trim()) {
     isLoading.value = true; // 开始加载
@@ -132,7 +132,8 @@ export default {
     // 清空输入框
     textarea.value = '';
   }
-};
+};  
+
     const clearAllMessages = () => {
       // 清空消息数组
       messages.value = [];
@@ -148,6 +149,7 @@ export default {
       systemAvatar,
     };
   },
+
   methods:{
     provide: () => ({ ElIcon: { size: '16' }, Promotion }),
   }
@@ -185,33 +187,34 @@ export default {
   height: 100%;
   background: pink;
 }
-.input{
 
-  background: yellow;
-}
 .footer-note {
   margin: 0 auto;
   display: flex;
   font-size: 12px;
+  color: white;
   text-align: center;
   align-items: center;
   justify-content: center;
   color: #8a8a8a;
-  margin-top: 10px;
-  border-top: 1px solid #92cada;
+  margin-top: 5px;
+  border-top: 0.8px solid #363636;
   width: 60%; /* 可以调整 */
+  background-color: #f7f7f7;
  }
  
 .header {
   display: flex;
   align-items: center;
   font-size: 16px;
-  background-color: #f7f7f7;
+  background-image: linear-gradient(to right, #363636, #252525);
+  border-radius: 5px;
   width: 100%;
-  height: 6%;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  height: 8%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
         }
 #chat-box {
+  background-color: white;
   margin-top:20px ;
   width: 60%;
   flex-grow: 1;
@@ -220,8 +223,11 @@ export default {
   padding: 10px;
   margin:0 auto;
   margin-bottom: 10px;
+
+  border-radius: 10px;
 }
 .data-div {
+  background-color: #f7f7f7;
  display: flex;
  flex-direction: column;
  justify-content: space-between;
@@ -284,9 +290,10 @@ export default {
   justify-content: center;
   width: 100%;
   box-sizing: border-box;
-  width: 60%;
+  width: 62%;
   height: 10%;
   margin: 0 auto; /* 居中对齐 */
+  background-color: #f7f7f7;
 }    
 
 .loading-icon{

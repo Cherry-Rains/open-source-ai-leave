@@ -25,6 +25,7 @@ export default {
   flex-direction: row;
   height: 100%;
   width: 100%;
+  background-color: #f7f7f7;
 }
 html, body, #app {  
   height: 100%;  

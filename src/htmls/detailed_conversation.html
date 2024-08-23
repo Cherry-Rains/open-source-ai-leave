@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
+    <link
+            rel="stylesheet"
+            as="style"
+            onload="this.rel='stylesheet'"
+            href="https://fonts.googleapis.com/css2?display=swap&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900&amp;family=Work+Sans%3Awght%40400%3B500%3B700%3B900"
+    />
+    <title>Detailed Conversation</title>
+    <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <style>
+        body {
+          margin: 0;
+          font-family: "Work Sans", "Noto Sans", sans-serif;
+        }
+        .scrollable-container {
+          max-height: 80vh; /* Adjust this value to control the maximum height */
+          overflow-y: auto; /* Enable vertical scrolling */
+          background-color: #ffffff; /* Match the background color of the content */
+          border-radius: 0.5rem; /* Rounded corners for the dialog */
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional shadow for the dialog */
+        }
+        .scrollable-content {
+          padding: 1rem;
+        }
+        .scrollable-content::-webkit-scrollbar {
+          width: 8px;
+        }
+        .scrollable-content::-webkit-scrollbar-thumb {
+          background-color: #888;
+          border-radius: 10px;
+        }
+        .scrollable-content::-webkit-scrollbar-thumb:hover {
+          background-color: #555;
+        }
+		.header {
+            display: flex;
+            align-items: center;
+        }
+        .back-button {
+            margin-right: 10px;
+            cursor: pointer;
+			width: 24px;
+            height: 24px;
+        }
+    </style>
+</head>
+<body>
+<div class="flex size-full min-h-screen flex-col bg-[#f7f7f7] justify-center items-center" style='font-family: "Work Sans", "Noto Sans", sans-serif;'>
+    <div class="layout-container flex h-full grow flex-col max-w-[1200px] w-full px-5 py-5">
+        <!-- Title Section -->
+        <div class="flex flex-col gap-3 mb-5">
+            <div class="header">
+                <img src="../image/back.png" class="back-button" onclick="goBack()" alt="Back">
+                <p class="text-[#0e141b] tracking-light text-[32px] font-bold leading-tight">
+                    Detailed Conversation
+                </p>
+            </div>
+        </div>
+        <!-- Button to View Conversation -->
+        <!--        <button onclick="viewConversation(23)">View Conversation</button> -->
+        <!-- Conversation Section with Scroll -->
+        <div id="conversation-container" class="scrollable-container flex flex-col max-w-[1200px]">
+            <div id="conversation-content" class="scrollable-content flex flex-col gap-3">
+                <!-- Conversation Entries will be inserted here by JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function getQueryParam(param) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+    }
+
+    async function fetchConversation(sessionId) {
+        try {
+            console.log(`Fetching conversation for session ID: ${sessionId}`);
+            const response = await fetch(`/conversation/${sessionId}`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            const data = await response.json();
+            console.log('Fetched conversation data:', data);
+            return data;
+        } catch (error) {
+            console.error('Error fetching conversation data:', error);
+            return null;
+        }
+    }
+    function goBack() {
+                window.location.href = 'test_index.html';
+            }
+    function renderConversation(conversation) {
+        const container = document.getElementById('conversation-content');
+        container.innerHTML = '';
+
+        console.log('Rendering conversation:', conversation);
+
+        conversation.forEach(entry => {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('flex', 'items-start', 'gap-3', 'p-4');
+
+            const role = entry.role;
+            const timestamp = entry.timestamp;
+            const content = entry.content;
+
+<!--            // 根据角色设置头像-->
+            let avatarUrl = '';
+            switch (role) {
+                case '调用AI':
+                    avatarUrl = 'image/ai.png';
+                    break;
+                case '调用AI结果':
+                    avatarUrl = 'image/ai.png';
+                    break;
+                case '调用AI结果回复用户':
+                    avatarUrl = 'image/ai.png';
+                    break;
+                case '调用工具结果':
+                    avatarUrl = 'image/tool.png';
+                    break;
+                case '用户':
+                    avatarUrl = 'image/user_.png';
+                    break;
+                case '系统':
+                    avatarUrl = 'image/system.png';
+                    break;
+                default:
+                    avatarUrl = 'images/default.png';
+                    break;
+            }
+
+
+            if (role === '用户' || role === '调用AI结果回复用户') {
+                messageDiv.classList.add('justify-end');
+            }
+
+            messageDiv.innerHTML = `
+                <div
+                    class="bg-center bg-no-repeat aspect-square bg-cover rounded-full w-10 shrink-0"
+                    style='background-image: url("${avatarUrl}");'
+                ></div>
+                <div class="flex flex-1 flex-col gap-1 items-start">
+                    <p class="text-[#4e7397] text-[13px] font-normal leading-normal max-w-[360px]">
+                        ${role} (${timestamp})
+                    </p>
+                    <p class="text-base font-normal leading-normal flex max-w-[360px] rounded-xl px-4 py-3 ${role === "系统" || role.includes("调用") ? "bg-[#e7edf3] text-[#0e141b]" : "bg-[#1980e6] text-slate-50"}">
+                        ${content}
+                    </p>
+                </div>
+            `;
+            container.appendChild(messageDiv);
+        });
+    }
+
+    async function loadConversation() {
+        const sessionId = getQueryParam('session_id');
+        if (sessionId) {
+            console.log(`Loading conversation for session ID: ${sessionId}`);
+            const conversationData = await fetchConversation(sessionId);
+            if (conversationData) {
+                renderConversation(conversationData);
+            } else {
+                console.error('No conversation data found.');
+            }
+        } else {
+            console.error('No session ID found in URL.');
+        }
+    }
+
+    // Load conversation on page load
+    document.addEventListener('DOMContentLoaded', loadConversation);
+</script>
+</body>
+</html>
