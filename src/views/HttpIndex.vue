@@ -55,10 +55,9 @@
         @keydown.enter="sendMessage"
         style="margin-right: 10px;"
       />
-      <el-button v-if="!isLoading" @click="sendMessage"  size="large"  circle>
+      <el-button v-if="!isLoading" @click="sendMessage"  size="large" style="margin-right: 5px;" circle>
         <el-image :src="require('../assets/images/send.png')" style="width: 30px;height: 30px;"></el-image>
       </el-button>
-      
       <el-image v-else :src="require('../assets/images/loading-icon.png')" class="loading-icon"><Loading /></el-image>
       <el-button size="large" @click="clearAllMessages" circle >
         <el-image :src="require('../assets/images/cleanMessage.png')" style="width: 30px;height: 30px;" ></el-image>
