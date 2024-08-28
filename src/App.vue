@@ -23,9 +23,12 @@ export default {
 #app{
   display: flex;
   flex-direction: row;
-  height: 100%;
-  width: 100%;
-  background-color: #f7f7f7;
+  height: 100%; /* 使用视口高度 */
+  width: 100%;  /* 使用视口宽度 */
+  background-image: url('./assets/images/backImage.jpg'); /* 替换为你的图片路径 */
+  background-size: cover; /* 使背景图像覆盖整个区域 */
+  background-position: center; /* 背景图像居中 */
+  background-repeat: no-repeat; /* 不重复背景图像 */
 }
 html, body, #app {  
   height: 100%;  

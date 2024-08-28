@@ -1,5 +1,5 @@
 <template>
-  <div class="sidebar-content" style="background-image: linear-gradient(to right, #252525, #363636);box-shadow: 2px 0 5px rgba(0, 0, 0, 0.4);border-radius: 10px;">
+  <div class="sidebar-content">
     <el-menu
       default-active="1"
       class="el-menu-vertical-demo"
@@ -95,6 +95,18 @@
         color: #fff;
         height: 10%; /* 设置固定高度 */
         position: relative; /* 确保侧边栏内容相对定位 */
+      }
+      .sidebar-content{
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      border-radius: 10px;
+      justify-content: space-between;
+      align-items: center;
+      background-image: linear-gradient(to bottom, #93ccdb, #7fa1bc);
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+      box-sizing: border-box;
+      transition: all 0.3s ease;
       }
       .el-icon {
         color: white !important;

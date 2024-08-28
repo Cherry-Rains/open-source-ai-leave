@@ -1,17 +1,17 @@
 <template>
 
-    <div class="header">
+
+    <div class="conv-container">
+      <div class="header">
       <img style="width:30px;height:30px;margin-left:10px" src="../assets/images/aislogo_blue.png" alt="Logo" />
       <div style="margin-left: 10px;">
-        <strong><span style="margin-left: 20px; font-size: 16px;margin-left: 0;margin-left: 3px;color: white;">AI助手</span></strong>
+        <strong><span style="margin-left: 20px; font-size: 16px;margin-left: 0;margin-left: 3px;">AI助手</span></strong>
         <div style="display: flex;flex-direction: row;  text-align: center;align-items: center;justify-content: center;">
-          <el-icon><Opportunity /></el-icon>
-          <span style="margin-left: 5px; font-size: 12px;color: white;">ver 1.0</span>
+          <span style="margin-left: 5px; font-size: 12px;;">ver 1.2</span>
         </div> 
-      </div>
-      
+      </div>     
     </div>
-    <div class="data-div">
+      <div class="data-div">
       <div id="chat-box">
         <div
           v-for="(message, index) in messages"
@@ -22,7 +22,7 @@
           <template v-if="message.isUser">
             <div class="user-message-content">
               <div>
-                <div class="timestampUser">{{ message.timestamp }}</div>
+                <div class="timestampUser">用户 {{ message.timestamp }}</div>
                 <div class="message-text" style="color: white;">{{ message.text }}</div>
               </div>
               <img :src="userAvatar" class="avatar" />
@@ -34,7 +34,7 @@
             <div class="system-message-content">
               <img :src="systemAvatar" class="avatar" />
               <div>
-                <div class="timestamp">{{ message.timestamp }}</div>
+                <div class="timestamp">LeaveMate {{ message.timestamp }}</div>
                 <div class="message-text"><span v-if="message.isLoading">
                 <el-icon class="is-loading" :size="40">
                   <Loading />
@@ -47,34 +47,39 @@
         </div>
       </div>
       <div class="input-container">
+        <el-button size="large" @click="clearAllMessages" circle >
+        <el-image :src="require('../assets/images/cleanMessage.png')" style="width: 30px;height: 30px;" ></el-image>
+      </el-button>
       <el-input
         v-model="textarea"
-        maxlength="99"
+        maxlength="399"
         type="textarea"
         placeholder="请在此处输入您想输入的内容..."
         @keydown.enter="sendMessage"
-        style="margin-right: 10px;"
+        style="margin-right: 10px; margin-left: 10px;border-radius: 8px;" 
       />
       <el-button v-if="!isLoading" @click="sendMessage"  size="large" style="margin-right: 5px;" circle>
         <el-image :src="require('../assets/images/send.png')" style="width: 30px;height: 30px;"></el-image>
       </el-button>
       <el-image v-else :src="require('../assets/images/loading-icon.png')" class="loading-icon"><Loading /></el-image>
-      <el-button size="large" @click="clearAllMessages" circle >
-        <el-image :src="require('../assets/images/cleanMessage.png')" style="width: 30px;height: 30px;" ></el-image>
-      </el-button>
-    </div>
-    </div>
 
+
+    </div>
     <div class="footer-note">
       服务生成的所有内容均由人工智能模型生成，其生成内容的准确性和完整性无法保证，不代表我们的态度或观点
     </div>
+    </div>
+    </div>
+
+
+
 
 </template>
 
 
 <script>
-import { ref } from 'vue';
-import { Loading,Promotion } from '@element-plus/icons-vue';
+import { ref, onMounted } from 'vue';
+import { Loading } from '@element-plus/icons-vue';
 
 export default {
   name: 'AiAssistant',
@@ -84,59 +89,72 @@ export default {
   setup() {
     const textarea = ref('');
     const messages = ref([]);
-    const userId = "aaaaa";
     const isLoading = ref(false);
+    const userId = generateUserId(); // 生成随机的 userId
     const userAvatar = require('../assets/images/user.png'); // 用户头像路径
     const systemAvatar = require('../assets/images/aislogo_blue.png'); // 系统头像路径
-    const timestamp = new Date().toLocaleTimeString(); // 获取当前时间戳
-    messages.value.push({ text: "用户您好！我是InCar公司的AI助手LeaveMate，请问有什么可以帮您的？", isUser: false, timestamp });
-    const sendMessage = async () => {
-  if (textarea.value.trim()) {
-    isLoading.value = true; // 开始加载
-    const timestamp = new Date().toLocaleTimeString(); // 获取当前时间戳
-    
-    // 添加用户消息
-    messages.value.push({ text: textarea.value, isUser: true, timestamp });
 
-    try {
-      // 调用接口
-      const response = await fetch('http://10.0.13.248:11111/wechatService', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          text: textarea.value,
-          userId: userId,
-        }),
-      });
-
-      // 检查响应状态
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      const data = await response.json();
-      
-      // 更新系统回复的时间戳
-      const systemTimestamp = new Date().toLocaleTimeString(); // 新的时间戳
-
-      // 添加系统回复
-      messages.value.push({ text: data.content, isUser: false, timestamp: systemTimestamp }); // 使用新的时间戳
-    } catch (error) {
-      console.error('There was a problem with the fetch operation:', error);
-    } finally {
-      isLoading.value = false; // 结束加载
+    function generateUserId() {
+      // 生成一个随机的用户 ID
+      return Math.random().toString(36).substring(2, 10);
     }
 
-    // 清空输入框
-    textarea.value = '';
-  }
-};  
+    onMounted(() => {
+      const timestamp = new Date().toLocaleTimeString(); // 获取当前时间戳
+      messages.value.push({
+        text: "用户您好！我是InCar公司的AI助手LeaveMate，请问有什么可以帮您的？",
+        isUser: false,
+        timestamp,
+      });
+    });
+
+    const sendMessage = async () => {
+      if (textarea.value.trim()) {
+        isLoading.value = true; // 开始加载
+        const timestamp = new Date().toLocaleTimeString(); // 获取当前时间戳
+        // 添加用户消息
+        messages.value.push({ text: textarea.value, isUser: true, timestamp });
+        textarea.value='';
+        try {
+          // 调用接口
+          const response = await fetch('http://10.0.13.248:11111/wechatService', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              text: textarea.value,
+              userId: userId,
+            }),
+          });
+
+          // 检查响应状态
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          const data = await response.json();
+          
+          // 更新系统回复的时间戳
+          const systemTimestamp = new Date().toLocaleTimeString(); // 新的时间戳
+
+          // 添加系统回复
+          messages.value.push({ text: data.content, isUser: false, timestamp: systemTimestamp });
+        } catch (error) {
+          console.error('There was a problem with the fetch operation:', error);
+        } finally {
+          isLoading.value = false; // 结束加载
+        }
+
+        // 清空输入框
+        textarea.value = '';
+      }
+    };
 
     const clearAllMessages = () => {
       // 清空消息数组
       messages.value = [];
     };
+
     return {
       textarea,
       messages,
@@ -148,16 +166,23 @@ export default {
       systemAvatar,
     };
   },
-
-  methods:{
-    provide: () => ({ ElIcon: { size: '16' }, Promotion }),
-  }
 };
 </script>
-
 <style scoped>
 
-
+.conv-container{
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #FAFAFA;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin: 20px;
+  overflow: hidden; /* 隐藏多余内容 */
+  background-color: rgba(255, 255, 255, 0.7); /* 半透明白色 */
+  height: 96vh;
+}
 .user-message-content{
   display: flex;
   align-items: flex-start; /* 头像和文本垂直对齐 */
@@ -170,7 +195,6 @@ export default {
   max-width: 90%;
   display: flex;
   align-items: center;
-  
 }
 
 .common-layout{
@@ -178,62 +202,59 @@ export default {
   width: 100%;
   height: 100%;
 }
-.head{
-  height: 70px;
-  background-color: white;
-}
+
 .dialog{
   height: 100%;
   background: pink;
 }
 
 .footer-note {
-  margin: 0 auto;
-  display: flex;
+  display: flex;                     /* 使用 Flexbox */
+  flex-direction: column;            /* 设置主轴方向为垂直 */
+  align-items: center;               /* 水平居中 */
+  justify-content: center;           /* 垂直居中 */
   font-size: 12px;
-  color: white;
-  text-align: center;
-  align-items: center;
-  justify-content: center;
   color: #8a8a8a;
-  margin-top: 5px;
-  border-top: 0.8px solid #363636;
-  width: 60%; /* 可以调整 */
-  background-color: #f7f7f7;
+  padding: 10px;
+  border-top: 2px solid #92cada;
+  width: 100%;
+  margin: 0 auto;                   /* 保证整体居中 */
  }
  
 .header {
   display: flex;
   align-items: center;
+  justify-content: center;
   font-size: 16px;
-  background-image: linear-gradient(to right, #363636, #252525);
-  border-radius: 5px;
+  color: #444 !important;
+  background-color: #FFFFFF;
+  border-bottom: 2px solid #E0E0E0;
   width: 100%;
-  height: 8%;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+  height: 60px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
         }
 #chat-box {
-  background-color: white;
-  margin-top:20px ;
-  width: 60%;
   flex-grow: 1;
   overflow-y: auto;
-  border-radius: 10px;
+  border-radius: 8px;
+  margin-top: 20px;
   padding: 10px;
-  margin:0 auto;
+  background-color: rgba(255, 255, 255, 1.0); /* 半透明白色 */
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
   margin-bottom: 10px;
-
-  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* 可选：添加阴影 */
+  height: 70vh;
 }
 .data-div {
-  background-color: #f7f7f7;
- display: flex;
- flex-direction: column;
- justify-content: space-between;
- padding: 10px;
- width: 100%;
- box-sizing: border-box;
- height: 88%
+  font-size: 17px ;
+  display: flex;
+  flex-direction: column;
+  width: 95%;            /* 设置宽度 */
+  border-radius: 8px;    /* 可选：圆角 */
+  font-family: 'Microsoft YaHei', sans-serif; /* 设置字体为微软雅黑 */
 }
 .message-container {
   display: flex;
@@ -255,7 +276,7 @@ export default {
   max-width: 90%;
 }
 .timestamp {
-  font-size: 10px;
+  font-size: 12px;
   color: #999;
   margin-bottom: 5px;
 }
@@ -263,12 +284,18 @@ export default {
   font-size: 10px;
   color: #999;
   margin-bottom: 5px;
+  margin-right: 15px;
 }
 .user-message .message-text {
   text-align: left;
-  background-color: #5d5cde;
   padding: 5px;
-  border-radius: 5px;
+  background-color: #E0DFFF;
+  padding: 10px;
+  border-radius: 15px;
+  margin-right: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  color: black !important;
+  border-radius: 8px;
 }
 .message-text {
   word-wrap: break-word; /* 允许单词换行 */
@@ -276,23 +303,20 @@ export default {
   max-width: 100%; /* 确保不超出容器 */
 }
 .system-message .message-text {
-  text-align: left;
-  background-color:#f7f7f7;
-  padding: 5px;
-  border-radius: 5px;
+  background-color: #F7F7F7;
+  padding: 10px;
+  border-radius: 15px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
 }
 
 
 .input-container {
   display: flex;
   align-items: center;
-  justify-content: center;
   width: 100%;
+  padding: 10px;
   box-sizing: border-box;
-  width: 62%;
-  height: 10%;
-  margin: 0 auto; /* 居中对齐 */
-  background-color: #f7f7f7;
 }    
 
 .loading-icon{
