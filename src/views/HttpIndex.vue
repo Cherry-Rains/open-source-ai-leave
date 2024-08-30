@@ -1,6 +1,6 @@
 <template>
 
-
+  
     <div class="conv-container">
       <div class="header">
       <img style="width:30px;height:30px;margin-left:10px" src="../assets/images/aislogo_blue.png" alt="Logo" />
@@ -80,6 +80,7 @@
 <script>
 import { ref, onMounted } from 'vue';
 import { Loading } from '@element-plus/icons-vue';
+import { ElMessage } from 'element-plus'
 
 export default {
   name: 'AiAssistant',
@@ -153,6 +154,11 @@ export default {
     const clearAllMessages = () => {
       // 清空消息数组
       messages.value = [];
+      ElMessage({
+      showClose: true,
+      message: '已清除历史记录！',
+      type: 'success',
+    })
     };
 
     return {
@@ -234,13 +240,13 @@ export default {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   position: sticky;
   top: 0;
-  z-index: 1000;
+
         }
 #chat-box {
   flex-grow: 1;
   overflow-y: auto;
   border-radius: 8px;
-  margin-top: 20px;
+
   padding: 10px;
   background-color: rgba(255, 255, 255, 1.0); /* 半透明白色 */
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);

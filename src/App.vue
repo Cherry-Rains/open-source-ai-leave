@@ -1,26 +1,27 @@
 <template>
   <div id="app">
-  <sidebarView></sidebarView>
-  <div class="routes">  <router-view></router-view>
-  </div>
-
+    <div>
+      <sidebarView class="sidebar" />
+    </div>
+    
+    <div class="routes">
+      <router-view></router-view>
+    </div>
   </div>
 </template>
 
 <script>
 import sidebarView from './views/side-bar-views.vue';
+
 export default {
-  components:{
-    sidebarView
+  components: {
+    sidebarView,
   },
-  methods: {
-}
-
-}
-
+};
 </script>
+
 <style>
-#app{
+#app {
   display: flex;
   flex-direction: row;
   height: 100%; /* 使用视口高度 */
@@ -30,15 +31,21 @@ export default {
   background-position: center; /* 背景图像居中 */
   background-repeat: no-repeat; /* 不重复背景图像 */
 }
-html, body, #app {  
-  height: 100%;  
-  widows: 100%;
-  margin: 0;  
-  padding: 0;  
-  box-sizing: border-box; /* 这是一个好习惯，可以确保padding和border不会增加元素的总宽度和高度 */  
+
+html, body, #app {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box; /* 这是一个好习惯，可以确保padding和border不会增加元素的总宽度和高度 */
 }
 .routes{
   width: 100%;
+  background: wheat;
 }
+.sidebar {
+  width: 10vh; /* 保持侧边栏宽度不变 */
+}
+
 
 </style>

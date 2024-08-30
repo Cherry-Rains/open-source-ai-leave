@@ -4,6 +4,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import ConvComponent from '../views/HttpIndex.vue';
 import  AboutComponent from '../views/about-us.vue';
 import LoggerComponent from '../views/logger-views.vue';
+import SystemComponent from '../views/oa-system-views.vue'
 
 // 定义路由规则
 const routes = [
@@ -22,7 +23,11 @@ const routes = [
     name: 'logger',
     component: LoggerComponent
   },
-
+  {
+    path:'/oa-sys',
+    name:'oa',
+    component:SystemComponent
+  }
   
 ];
 
