@@ -41,7 +41,7 @@ html, body, #app {
 }
 .routes{
   width: 100%;
-  background: wheat;
+
 }
 .sidebar {
   width: 10vh; /* 保持侧边栏宽度不变 */
