@@ -77,6 +77,7 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { ElMessage } from 'element-plus';
 import axios from 'axios';
+import { API_BASE_URL } from '@/config';
 export default {
   setup() {
     const searchUsername = ref('');
@@ -86,7 +87,7 @@ export default {
     const editingUser = ref({});
 
     const fetchData = () => {
-      axios.get('http://10.0.13.223:10700/api/users')
+      axios.get(`${API_BASE_URL}/api/users`)
         .then(response => {
           users.value = response.data;  // 直接使用 response.data
           ElMessage.success('加载后台数据成功!');
@@ -97,8 +98,9 @@ export default {
     };
    
     const saveData = (id)=>{
-      axios.put(`http://10.0.13.223:10700/api/users/${id}`, users.value)
-        .then(() =>{
+      axios.put(`${API_BASE_URL}/api/users/${id}`, users.value)
+        .then(response => () =>{
+          console.log(response);
           ElMessage.success('用户数据更新成功!');
         })
         .catch(error => {
