@@ -1,6 +1,5 @@
 <template>
 
-  
     <div class="conv-container">
       <div class="header">
       <img style="width:30px;height:30px;margin-left:10px" src="../assets/images/aislogo_blue.png" alt="Logo" />

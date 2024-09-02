@@ -1,9 +1,11 @@
-fetchData<template>
+<template>
+   <transition name="el-zoom-in-top">
   <div class="container">
+
     <div class="header">
       <!-- 头部内容 -->
     </div>
-    <div style="width: 90%">
+    
       <div class="search-bar">
         用户ID筛选：<el-input v-model="searchUserID" placeholder="userId"></el-input>
         用户名筛选：<el-input v-model="searchUsername" placeholder="用户名"></el-input>
@@ -11,18 +13,18 @@ fetchData<template>
       </div>
       <div class="table-sys">
         <el-table :data="filteredUsers" ref="tableRef" style="width: 100%;">
-          <el-table-column prop="username" label="姓名" width="auto"></el-table-column>
-          <el-table-column prop="userId" label="用户ID"></el-table-column>
-          <el-table-column prop="oaAccount" label="OA系统用户名"></el-table-column>
-          <el-table-column prop="oaPassword" label="OA系统密码"></el-table-column>
-          <el-table-column fixed="right" label="操作">
+          <el-table-column prop="username" label="姓名" flex="1"></el-table-column>
+          <el-table-column prop="userId" label="用户ID" flex="1"></el-table-column>
+          <el-table-column prop="oaAccount" label="OA系统用户名" flex="1"></el-table-column>
+          <el-table-column prop="oaPassword" label="OA系统密码" flex="1"></el-table-column>
+          <el-table-column fixed="right" label="操作" flex="1">
             <template #default="scope">
               <el-button size="small" @click="editUser(scope.row)">编辑</el-button>
             </template>
           </el-table-column>
         </el-table>
       </div>
-    </div>
+    
 
     <el-dialog v-model="dialogVisible" title="编辑用户信息">
       <el-descriptions class="margin-top"
@@ -66,13 +68,15 @@ fetchData<template>
         </span>
       </template>
     </el-dialog>
+
   </div>
+</transition>
 </template>
 
 <script>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { ElMessage } from 'element-plus';
-
+import axios from 'axios';
 export default {
   setup() {
     const searchUsername = ref('');
@@ -80,16 +84,27 @@ export default {
     const users = ref([]);
     const dialogVisible = ref(false);
     const editingUser = ref({});
-    const fetchData = () => {
-      fetch('http://10.0.13.223:10700/api/users')
-        .then(response => response.json())
-        .then(data=>{
-          users.value=data;
-          ElMessage.success('加载后台数据成功!')
-        })
-        .catch(error => ElMessage.error('Error fetching data: ' + error));
-    };
 
+    const fetchData = () => {
+      axios.get('http://10.0.13.223:10700/api/users')
+        .then(response => {
+          users.value = response.data;  // 直接使用 response.data
+          ElMessage.success('加载后台数据成功!');
+        })
+        .catch(error => {
+          ElMessage.error('Error fetching data: ' + error);
+        });
+    };
+   
+    const saveData = (id)=>{
+      axios.put(`http://10.0.13.223:10700/api/users/${id}`, users.value)
+        .then(() =>{
+          ElMessage.success('用户数据更新成功!');
+        })
+        .catch(error => {
+          ElMessage.error('Error fetching data: ' + error);
+        });
+    };
 
     const filteredUsers = computed(() => {
       return users.value.filter(user => {
@@ -104,6 +119,7 @@ export default {
 
     const saveChanges = () => {
       users.value = users.value.map(u => u.userId === editingUser.value.userId ? editingUser.value : u);
+      saveData(editingUser.value.userId);
       ElMessage.success('用户信息已更新');
       dialogVisible.value = false;
     };
