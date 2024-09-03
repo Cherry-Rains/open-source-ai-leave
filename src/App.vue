@@ -44,7 +44,7 @@ html, body, #app {
 
 }
 .sidebar {
-  width: 10vh; /* 保持侧边栏宽度不变 */
+
 }
 
 

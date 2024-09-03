@@ -9,9 +9,10 @@
         <el-input v-model="searchUserID" placeholder="请输入用户ID" style="width: 300px; margin-right: 10px; border-radius: 5px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);" clearable></el-input>
         <el-input v-model="searchUsername" placeholder="请输入用户名" style="width: 300px; margin-right: 10px; border-radius: 5px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);" clearable></el-input>
         <!-- <el-button @click="fetchData()"></el-button> -->
+        <el-button type="primary" @click="showAddUser"><el-icon style="margin-right: 3px;"><Plus /></el-icon>新增用户</el-button>
       </div>
       <div class="table-sys" style="flex: 1; display: flex; justify-content: center;">
-        <el-table :data="filteredUsers" ref="tableRef" style="width: 1210px; height: 600px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);" header-align="center" >
+        <el-table :data="filteredUsers" ref="tableRef" style="width: 1210px; height: 500px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);" header-align="center" >
           <el-table-column prop="username" label="姓名" flex="1"></el-table-column>
           <el-table-column prop="userId" label="用户ID" flex="1"></el-table-column>
           <el-table-column prop="oaAccount" label="OA系统用户名" flex="1"></el-table-column>
@@ -49,6 +50,46 @@
         <el-descriptions-item>
           <template #label>
             <div class="cell-item">
+              <el-icon><Avatar /></el-icon>
+              姓名
+            </div>
+          </template>
+          <el-input v-model="editingUser.username"></el-input>
+        </el-descriptions-item>
+        <el-descriptions-item label="OA系统用户名">
+          <el-input v-model="editingUser.oaAccount"></el-input>
+        </el-descriptions-item>
+        <el-descriptions-item label="OA系统密码">
+          <el-input v-model="editingUser.oaPassword" type="password"></el-input>
+        </el-descriptions-item>
+      </el-descriptions>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="cancelAddUser">取消</el-button>
+          <el-button type="primary" @click="saveChanges">保存</el-button>
+        </span>
+      </template>
+    </el-dialog>
+
+    <el-dialog v-model="dialogAddUser" title="新增用户信息">
+      <el-descriptions class="margin-top"
+                       :column="2"
+                       :size="large"
+                       :border="true">
+        <el-descriptions-item>
+          <template #label>
+            <div class="cell-item">
+              <el-icon><Avatar /></el-icon>
+              用户Id
+            </div>
+            
+          </template>
+          <el-input v-model="editingUser.userId"></el-input>
+        </el-descriptions-item>
+
+        <el-descriptions-item>
+          <template #label>
+            <div class="cell-item">
               <el-icon :style="iconStyle">
                 <user />
               </el-icon>
@@ -66,12 +107,11 @@
       </el-descriptions>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="dialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="saveChanges">保存</el-button>
+          <el-button @click="cancelAddUser">取消</el-button>
+          <el-button type="primary" @click="addSaves">保存</el-button>
         </span>
       </template>
     </el-dialog>
-
   </div>
 </transition>
 </template>
@@ -79,6 +119,7 @@
 <script>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { ElMessage,ElMessageBox } from 'element-plus';
+import {Plus} from '@element-plus/icons-vue'
 import axios from 'axios';
 import { API_BASE_URL } from '@/config';
 export default {
@@ -88,6 +129,7 @@ export default {
     const users = ref([]);
     const dialogVisible = ref(false);
     const editingUser = ref({});
+    const dialogAddUser = ref(false);
 
     const fetchData = () => {
       axios.get(`${API_BASE_URL}/api/users`)
@@ -101,7 +143,7 @@ export default {
     };
    
     const saveData = (id)=>{
-      axios.put(`http://10.0.13.223:10700/api/users/${id}`, users.value)
+      axios.put(`http://10.0.13.223:11111/api/users/${id}`, users.value)
         .then(() =>{
           ElMessage.success('用户数据更新成功!');
         })
@@ -109,10 +151,21 @@ export default {
           ElMessage.error('Error fetching data: ' + error);
         });
     };
+    const showAddUser=()=>{
+      dialogAddUser.value=true;
+      
+    }
 
     const filteredUsers = computed(() => {
       return users.value.filter(user => {
-        return user.username.includes(searchUsername.value) && user.userId.includes(searchUserID.value);
+        // 检查 user.username 和 user.userId 是否存在
+        const username = user.username || '';
+        const userId = user.userId || '';
+
+        return (
+          username.includes(searchUsername.value) &&
+          userId.includes(searchUserID.value)
+        );
       });
     });
 
@@ -149,6 +202,37 @@ export default {
       saveData(editingUser.value.userId);
       ElMessage.success('用户信息已更新');
       dialogVisible.value = false;
+      
+    };
+
+    const cancelAddUser = () => {
+      dialogAddUser.value = false;
+      Object.assign(editingUser, {
+        userId: '',
+        username: '',
+        oaAccount: '',
+        oaPassword: ''
+      });
+    };
+    const addSaves = ()=>{
+      dialogAddUser.value=false;
+      axios.post('http://10.0.13.223:11111/api/users/', editingUser.value)
+        .then(response => {
+          console.log(response.data);
+          dialogAddUser.value = false;
+          // 清空表单
+          Object.assign(editingUser.value, {
+            userId: '',
+            username: '',
+            oaAccount: '',
+            oaPassword: ''
+          });
+          // 可以在这里处理成功后的逻辑，比如刷新数据等
+          ElMessage.success('用户信息新增成功');
+        })
+        .catch(error => {
+          console.error(error);
+        });
     };
 
 
@@ -169,13 +253,20 @@ export default {
       searchUserID,
       filteredUsers,
       dialogVisible,
+      dialogAddUser,
       editingUser,
       editUser,
       deleteUser,
       saveChanges,
-      fetchData
+      fetchData,
+      showAddUser,
+      addSaves,
+      cancelAddUser
     };
   },
+  components:{
+    Plus
+  }
 };
 </script>
 <style scoped>

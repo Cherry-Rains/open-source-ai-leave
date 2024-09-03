@@ -12,7 +12,7 @@
           clearable
         />
    
-      <div class="dateSelect" style="height: 5%;background-color: antiquewhite;">
+      
         <el-date-picker
           id="start-time"
           v-model="startTime"
@@ -30,7 +30,7 @@
         <el-button @click="searchdb" :icon="Search">
           查询
         </el-button>
-      </div>
+      
 
       <div class="DBcontainer" style="height: auto; background-color: aqua;">
         <el-table :data="paginatedData" style="width: 100%">

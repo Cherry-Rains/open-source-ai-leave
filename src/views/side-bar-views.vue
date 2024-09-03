@@ -82,7 +82,7 @@ export default {
 
 <style scoped>
 .sidebar-content {
-  width: 10vh;
+  width: 8vh;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -102,7 +102,7 @@ export default {
   background-color: transparent;
   color: white !important;
   transition: background-color 0.3s ease;
-  height: 10%;
+  height: 100%;
 }
 
 

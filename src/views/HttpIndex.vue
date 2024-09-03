@@ -114,7 +114,6 @@ export default {
         const timestamp = new Date().toLocaleTimeString(); // 获取当前时间戳
         // 添加用户消息
         messages.value.push({ text: textarea.value, isUser: true, timestamp });
-        textarea.value='';
         try {
           // 调用接口
           const response = await fetch('http://10.0.13.248:11111/wechatService', {
