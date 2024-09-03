@@ -1,25 +1,28 @@
 <template>
    <transition name="el-zoom-in-top">
-  <div class="container">
+  <div class="container" style="display: flex; flex-direction: column; height: 100vh;">
 
     <div class="header">
       <!-- 头部内容 -->
     </div>
-    
-      <div class="search-bar">
-        用户ID筛选：<el-input v-model="searchUserID" placeholder="userId"></el-input>
-        用户名筛选：<el-input v-model="searchUsername" placeholder="用户名"></el-input>
-        <el-button @click="fetchData()"></el-button>
+      <div class="search-bar" style="margin-top: 20px; margin-bottom: 20px; display: flex; justify-content: center; align-items: center;">
+        <el-input v-model="searchUserID" placeholder="请输入用户ID" style="width: 300px; margin-right: 10px; border-radius: 5px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);" clearable></el-input>
+        <el-input v-model="searchUsername" placeholder="请输入用户名" style="width: 300px; margin-right: 10px; border-radius: 5px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);" clearable></el-input>
+        <!-- <el-button @click="fetchData()"></el-button> -->
       </div>
-      <div class="table-sys">
-        <el-table :data="filteredUsers" ref="tableRef" style="width: 100%;">
+      <div class="table-sys" style="flex: 1; display: flex; justify-content: center;">
+        <el-table :data="filteredUsers" ref="tableRef" style="width: 1210px; height: 600px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);" header-align="center" >
           <el-table-column prop="username" label="姓名" flex="1"></el-table-column>
           <el-table-column prop="userId" label="用户ID" flex="1"></el-table-column>
           <el-table-column prop="oaAccount" label="OA系统用户名" flex="1"></el-table-column>
           <el-table-column prop="oaPassword" label="OA系统密码" flex="1"></el-table-column>
-          <el-table-column fixed="right" label="操作" flex="1">
+          <el-table-column fixed="right" label="操作" width="150px">
+            
             <template #default="scope">
-              <el-button size="small" @click="editUser(scope.row)">编辑</el-button>
+              <div style="display: flex;">
+                <el-button size="small" type="danger" @click="deleteUser(scope.row)" style="margin-right: 10px;">删除</el-button>
+                <el-button size="small" type="primary" @click="editUser(scope.row)">编辑</el-button>
+              </div>
             </template>
           </el-table-column>
         </el-table>
@@ -75,7 +78,7 @@
 
 <script>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
-import { ElMessage } from 'element-plus';
+import { ElMessage,ElMessageBox } from 'element-plus';
 import axios from 'axios';
 import { API_BASE_URL } from '@/config';
 export default {
@@ -98,9 +101,8 @@ export default {
     };
    
     const saveData = (id)=>{
-      axios.put(`${API_BASE_URL}/api/users/${id}`, users.value)
-        .then(response => () =>{
-          console.log(response);
+      axios.put(`http://10.0.13.223:10700/api/users/${id}`, users.value)
+        .then(() =>{
           ElMessage.success('用户数据更新成功!');
         })
         .catch(error => {
@@ -117,6 +119,29 @@ export default {
     const editUser = (user) => {
       editingUser.value = { ...user };
       dialogVisible.value = true;
+    };
+    const deleteUser = (user) => {
+      ElMessageBox.confirm(
+        `确定要删除用户 ${user.username} 吗？`,
+        '提示',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning',
+        }
+      ).then(() => {
+        axios.delete(`http://10.0.13.223:11111/api/users/${user.userId}`)
+          .then(() => {
+            // 从 users 列表中移除已删除的用户
+            users.value = users.value.filter(u => u.userId !== user.userId);
+            ElMessage.success('用户删除成功!');
+          })
+          .catch(error => {
+            ElMessage.error('Error deleting user: ' + error);
+          });
+      }).catch(() => {
+        ElMessage.info('已取消删除');
+      });
     };
 
     const saveChanges = () => {
@@ -146,6 +171,7 @@ export default {
       dialogVisible,
       editingUser,
       editUser,
+      deleteUser,
       saveChanges,
       fetchData
     };
