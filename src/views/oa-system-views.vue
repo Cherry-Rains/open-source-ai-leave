@@ -111,7 +111,8 @@ export default {
 
     const filteredUsers = computed(() => {
       return users.value.filter(user => {
-        return user.username.includes(searchUsername.value) && user.userId.includes(searchUserID.value);
+        return user.username && user.username.includes(searchUsername.value) &&
+           user.userId && user.userId.includes(searchUserID.value);
       });
     });
 
@@ -192,9 +193,10 @@ export default {
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   margin: 20px;
-  overflow: hidden; /* 隐藏多余内容 */
+  overflow-y: auto; /* 保留垂直滚动功能 */
   background-color: rgba(255, 255, 255, 0.7); /* 半透明白色 */
   height: 96vh;
+  scrollbar-width: none; /* 对于Firefox隐藏滚动条 */
 }
 .header {
   display: flex;
