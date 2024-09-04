@@ -13,7 +13,7 @@
                 <h2>{{ item.version }}</h2>
                 <ul>
                   <li v-for="(change, idx) in item.changes" :key="idx">
-                    <el-tag type="success" v-if="change.startsWith('*')">{{ change.slice(1) }}</el-tag>
+                    <el-tag type="success" v-if="change.startsWith('*')">{{ change.slice(1)}}</el-tag>
                     <span v-else>{{ change }}</span>
                   </li>
                 </ul>

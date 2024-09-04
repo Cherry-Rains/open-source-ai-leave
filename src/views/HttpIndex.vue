@@ -80,7 +80,8 @@
 import { ref, onMounted } from 'vue';
 import { Loading } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus'
-
+import { API_BASE_URL } from '@/config';
+import axios from 'axios';
 export default {
   name: 'AiAssistant',
   components: {
@@ -116,15 +117,12 @@ export default {
         messages.value.push({ text: textarea.value, isUser: true, timestamp });
         try {
           // 调用接口
-          const response = await fetch('http://10.0.13.248:11111/wechatService', {
-            method: 'POST',
+          const response = await axios.post(`${API_BASE_URL}/httpService`, {
+            text: textarea.value,
+            userId: userId,
             headers: {
               'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              text: textarea.value,
-              userId: userId,
-            }),
+            }
           });
 
           // 检查响应状态

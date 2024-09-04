@@ -143,7 +143,7 @@ export default {
     };
    
     const saveData = (id)=>{
-      axios.put(`http://10.0.13.223:11111/api/users/${id}`, users.value)
+      axios.put(`${API_BASE_URL}/api/users/${id}`, users.value)
         .then(() =>{
           ElMessage.success('用户数据更新成功!');
         })
@@ -183,7 +183,7 @@ export default {
           type: 'warning',
         }
       ).then(() => {
-        axios.delete(`http://10.0.13.223:11111/api/users/${user.userId}`)
+        axios.delete(`${API_BASE_URL}/api/users/${user.userId}`)
           .then(() => {
             // 从 users 列表中移除已删除的用户
             users.value = users.value.filter(u => u.userId !== user.userId);
@@ -216,7 +216,7 @@ export default {
     };
     const addSaves = ()=>{
       dialogAddUser.value=false;
-      axios.post('http://10.0.13.223:11111/api/users/', editingUser.value)
+      axios.post(`${API_BASE_URL}/api/users`, editingUser.value)
         .then(response => {
           console.log(response.data);
           dialogAddUser.value = false;

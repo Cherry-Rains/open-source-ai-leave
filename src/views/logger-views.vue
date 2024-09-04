@@ -76,9 +76,11 @@
 </template>
 
 <script>
+import axios from 'axios';
 import { ref, computed } from 'vue';
 import { ElMessage } from 'element-plus';
 import { Search } from '@element-plus/icons-vue';
+import { API_BASE_URL } from '@/config';
 
 export default {
   setup() {
@@ -91,13 +93,12 @@ export default {
     const dialogVisible = ref(false);
 
     const fetchData = () => {
-      fetch('http://localhost:11111/all-sessions')
-        .then(response => response.json())
-        .then(data => {
+      axios.get(`${API_BASE_URL}/all-sessions`)
+        .then(response => {
           const userIdValue = userId.value.trim().toLowerCase();
           const startTimeValue = new Date(startTime.value);
           const endTimeValue = new Date(endTime.value);
-          filteredData.value = data.filter(item => {
+          filteredData.value = response.data.filter(item => {
             const itemStartTime = new Date(item.starttime);
             const itemEndTime = new Date(item.endtime);
             const matchesUserId = userIdValue === '' || item.user_id.toLowerCase().includes(userIdValue);
@@ -160,10 +161,9 @@ export default {
       }
     },
     fetchConversation(sessionId) {
-      return fetch('http://localhost:11111/conversation/' + sessionId)
-        .then(response => response.json())
-        .then(data => {
-          return data;
+      return axios.get(`${API_BASE_URL}/conversation/${sessionId}`)
+        .then(response => {
+          return response.data;
         })
         .catch(error => {
           throw new Error('Error fetching data: ' + error.message);

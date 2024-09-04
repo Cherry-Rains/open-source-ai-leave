@@ -5,7 +5,7 @@
       class="el-menu-vertical-demo"
       @open="handleOpen"
       @close="handleClose"
-      style="background-color: transparent;border-color: transparent;box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);width: 10vh;">
+      style="background-color: transparent;border-color: transparent;box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);width: 8vh;">
         <div class="sidebar-head" style="display: flex; flex-direction: column; align-items: center; height: 15%;justify-content: center;">
           <el-image :src="require('../assets/images/aislogo.png')" style="width: 45px; height: 45px;"></el-image>
           <span style="font-size: 12px;color: white;">AI助手</span>
