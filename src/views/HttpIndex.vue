@@ -11,7 +11,7 @@
       </div>     
     </div>
       <div class="data-div">
-      <div id="chat-box">
+      <div id="chat-box" ref="chatContainer">
         <div
           v-for="(message, index) in messages"
           :key="index"
@@ -69,10 +69,6 @@
     </div>
     </div>
     </div>
-
-
-
-
 </template>
 
 
@@ -82,6 +78,7 @@ import { Loading } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus'
 import { API_BASE_URL } from '@/config';
 import axios from 'axios';
+
 export default {
   name: 'AiAssistant',
   components: {
@@ -117,34 +114,40 @@ export default {
         messages.value.push({ text: textarea.value, isUser: true, timestamp });
         try {
           // 调用接口
-          const response = await axios.post(`${API_BASE_URL}/httpService`, {
-            text: textarea.value,
-            userId: userId,
-            headers: {
-              'Content-Type': 'application/json',
+          const response = await axios.post(`${API_BASE_URL}/api/httpService`, {
+          text: textarea.value,
+          userId: userId
+          },{
+          headers: {
+                'Content-Type': 'application/json',
             }
-          });
-
+        })
+        ;
           // 检查响应状态
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
+          if (response.data.code !== 0) {
+              throw new Error(response.data.message || 'Unexpected response');
           }
-          const data = await response.json();
-          
+          const data = response.data;
           // 更新系统回复的时间戳
           const systemTimestamp = new Date().toLocaleTimeString(); // 新的时间戳
-
           // 添加系统回复
-          messages.value.push({ text: data.content, isUser: false, timestamp: systemTimestamp });
+          messages.value.push({ text: data.data, isUser: false, timestamp: systemTimestamp });
+          scrollToBottom()
+          // 滚动到底部
+          
         } catch (error) {
           console.error('There was a problem with the fetch operation:', error);
         } finally {
           isLoading.value = false; // 结束加载
         }
-
         // 清空输入框
         textarea.value = '';
       }
+    };
+
+    const scrollToBottom = () => {
+      const chatContainer = document.querySelector('#chat-box');
+      chatContainer.scrollTop = chatContainer.scrollHeight;
     };
 
     const clearAllMessages = () => {
@@ -242,7 +245,6 @@ export default {
   flex-grow: 1;
   overflow-y: auto;
   border-radius: 8px;
-
   padding: 10px;
   background-color: rgba(255, 255, 255, 1.0); /* 半透明白色 */
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);

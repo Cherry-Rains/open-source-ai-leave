@@ -7,12 +7,10 @@
       <div class="userIdInput" style="height: 5%;">
         <el-input
           id="user-id-input"
-          placeholder="请输入用户ID"
-          v-model="userId"
+          placeholder="请输入用户名"
+          v-model="userName"
           clearable
         />
-   
-      
         <el-date-picker
           id="start-time"
           v-model="startTime"
@@ -34,15 +32,16 @@
 
       <div class="DBcontainer" style="height: auto; background-color: aqua;">
         <el-table :data="paginatedData" style="width: 100%">
-          <el-table-column prop="user_id" label="用户ID" width="400px"></el-table-column>
-          <el-table-column prop="session_id" label="会话ID" width="150px"></el-table-column>
+          <el-table-column prop="id" label="对话Id" width="100px"></el-table-column>
+          <el-table-column prop="username" label="用户名" width="100px"></el-table-column>
+          <el-table-column prop="userId" label="用户ID" width="200px"></el-table-column>
+          <el-table-column prop="startTime" label="起始时间" width="250"></el-table-column>
+          <el-table-column prop="endTime" label="结束时间" width="250"></el-table-column>
           <el-table-column label="对话历史" width="200px">
             <template #default="scope">
               <el-button plain @click="showDialog(scope.row)" class="text-blue-600">查看对话</el-button>
             </template>
           </el-table-column>
-          <el-table-column prop="starttime" label="起始时间" width="250"></el-table-column>
-          <el-table-column prop="endtime" label="结束时间" width="250"></el-table-column>
         </el-table>
       </div>
 
@@ -84,7 +83,7 @@ import { API_BASE_URL } from '@/config';
 
 export default {
   setup() {
-    const userId = ref('');
+    const userName = ref('');
     const startTime = ref(null);
     const endTime = ref(null);
     const currentPage = ref(1);
@@ -93,22 +92,22 @@ export default {
     const dialogVisible = ref(false);
 
     const fetchData = () => {
-      axios.get(`${API_BASE_URL}/all-sessions`)
-        .then(response => {
-          const userIdValue = userId.value.trim().toLowerCase();
-          const startTimeValue = new Date(startTime.value);
-          const endTimeValue = new Date(endTime.value);
-          filteredData.value = response.data.filter(item => {
-            const itemStartTime = new Date(item.starttime);
-            const itemEndTime = new Date(item.endtime);
-            const matchesUserId = userIdValue === '' || item.user_id.toLowerCase().includes(userIdValue);
-            const matchesStartTime = isNaN(startTimeValue.getTime()) || itemStartTime >= startTimeValue;
-            const matchesEndTime = isNaN(endTimeValue.getTime()) || itemEndTime <= endTimeValue;
-            return matchesUserId && matchesStartTime && matchesEndTime;
-          });
-        })
-        .catch(error => ElMessage.error('Error fetching data: ' + error));
-    };
+    axios.get(`${API_BASE_URL}/api/log/conversation/page`)
+      .then(response => {
+        const userNameValue = userName.value.trim().toLowerCase();
+        const startTimeValue = new Date(startTime.value);
+        const endTimeValue = new Date(endTime.value);
+        filteredData.value = response.data.data.content.filter(item => {
+          const itemStartTime = new Date(item.startTime);
+          const itemEndTime = new Date(item.endTime);
+          const matchesUserName = !userNameValue || (item.username && item.username.toLowerCase().includes(userNameValue));
+          const matchesStartTime = isNaN(startTimeValue.getTime()) || itemStartTime >= startTimeValue;
+          const matchesEndTime = isNaN(endTimeValue.getTime()) || itemEndTime <= endTimeValue; 
+          return matchesUserName || matchesStartTime || matchesEndTime;
+        });
+      })
+      .catch(error => ElMessage.error('Error fetching data: ' + error));
+};
 
     const searchdb = () => {
       fetchData();
@@ -134,7 +133,7 @@ export default {
     };
 
     return {
-      userId,
+      userName,
       dialogVisible,
       startTime,
       endTime,

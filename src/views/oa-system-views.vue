@@ -8,14 +8,14 @@
       <div class="search-bar" style="margin-top: 20px; margin-bottom: 20px; display: flex; justify-content: center; align-items: center;">
         <el-input v-model="searchUserID" placeholder="请输入用户ID" style="width: 300px; margin-right: 10px; border-radius: 5px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);" clearable></el-input>
         <el-input v-model="searchUsername" placeholder="请输入用户名" style="width: 300px; margin-right: 10px; border-radius: 5px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);" clearable></el-input>
-        <!-- <el-button @click="fetchData()"></el-button> -->
+        <el-button @click="fetchData()">查询</el-button>
         <el-button type="primary" @click="showAddUser"><el-icon style="margin-right: 3px;"><Plus /></el-icon>新增用户</el-button>
       </div>
       <div class="table-sys" style="flex: 1; display: flex; justify-content: center;">
         <el-table :data="filteredUsers" ref="tableRef" style="width: 1210px; height: 500px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);" header-align="center" >
           <el-table-column prop="username" label="姓名" flex="1"></el-table-column>
-          <el-table-column prop="userId" label="用户ID" flex="1"></el-table-column>
-          <el-table-column prop="oaAccount" label="OA系统用户名" flex="1"></el-table-column>
+          <el-table-column prop="wxId" label="用户ID" flex="1"></el-table-column>
+          <el-table-column prop="oaUsername" label="OA系统用户名" flex="1"></el-table-column>
           <el-table-column prop="oaPassword" label="OA系统密码" flex="1"></el-table-column>
           <el-table-column fixed="right" label="操作" width="150px">
             
@@ -44,7 +44,7 @@
               用户Id
             </div>
           </template>
-          {{ editingUser.userId }}
+          {{ editingUser.wxId }}
         </el-descriptions-item>
 
         <el-descriptions-item>
@@ -57,7 +57,7 @@
           <el-input v-model="editingUser.username"></el-input>
         </el-descriptions-item>
         <el-descriptions-item label="OA系统用户名">
-          <el-input v-model="editingUser.oaAccount"></el-input>
+          <el-input v-model="editingUser.oaUsername"></el-input>
         </el-descriptions-item>
         <el-descriptions-item label="OA系统密码">
           <el-input v-model="editingUser.oaPassword" type="password"></el-input>
@@ -84,7 +84,7 @@
             </div>
             
           </template>
-          <el-input v-model="editingUser.userId"></el-input>
+          <el-input v-model="editingUser.wxId"></el-input>
         </el-descriptions-item>
 
         <el-descriptions-item>
@@ -99,7 +99,7 @@
           <el-input v-model="editingUser.username"></el-input>
         </el-descriptions-item>
         <el-descriptions-item label="OA系统用户名">
-          <el-input v-model="editingUser.oaAccount"></el-input>
+          <el-input v-model="editingUser.oaUsername"></el-input>
         </el-descriptions-item>
         <el-descriptions-item label="OA系统密码">
           <el-input v-model="editingUser.oaPassword" type="password"></el-input>
@@ -132,9 +132,9 @@ export default {
     const dialogAddUser = ref(false);
 
     const fetchData = () => {
-      axios.get(`${API_BASE_URL}/api/users`)
+      axios.get(`${API_BASE_URL}/api/log/user/list`)
         .then(response => {
-          users.value = response.data;  // 直接使用 response.data
+          users.value = response.data.data;  // 直接使用 response.data
           ElMessage.success('加载后台数据成功!');
         })
         .catch(error => {
@@ -142,8 +142,8 @@ export default {
         });
     };
    
-    const saveData = (id)=>{
-      axios.put(`${API_BASE_URL}/api/users/${id}`, users.value)
+    const saveData = ()=>{
+      axios.post(`${API_BASE_URL}/api/log/user/save`, editingUser.value)
         .then(() =>{
           ElMessage.success('用户数据更新成功!');
         })
@@ -153,14 +153,13 @@ export default {
     };
     const showAddUser=()=>{
       dialogAddUser.value=true;
-      
     }
 
     const filteredUsers = computed(() => {
       return users.value.filter(user => {
         // 检查 user.username 和 user.userId 是否存在
         const username = user.username || '';
-        const userId = user.userId || '';
+        const userId = user.wxId || '';
 
         return (
           username.includes(searchUsername.value) &&
@@ -173,33 +172,36 @@ export default {
       editingUser.value = { ...user };
       dialogVisible.value = true;
     };
-    const deleteUser = (user) => {
-      ElMessageBox.confirm(
-        `确定要删除用户 ${user.username} 吗？`,
-        '提示',
-        {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning',
-        }
-      ).then(() => {
-        axios.delete(`${API_BASE_URL}/api/users/${user.userId}`)
-          .then(() => {
-            // 从 users 列表中移除已删除的用户
-            users.value = users.value.filter(u => u.userId !== user.userId);
-            ElMessage.success('用户删除成功!');
-          })
-          .catch(error => {
-            ElMessage.error('Error deleting user: ' + error);
-          });
-      }).catch(() => {
-        ElMessage.info('已取消删除');
+
+
+   const deleteUser = (user) => {
+  ElMessageBox.confirm(
+    `确定要删除用户 ${user.username} 吗？`,
+    '提示',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }
+  ).then(() => {
+    const ids = [user.id]; // 直接使用 wxId，不需要转换为 Number 类型
+    axios.delete(`${API_BASE_URL}/api/log/user/delete?ids=${ids.join(',')}`)
+      .then(() => {
+        // 从 users 列表中移除已删除的用户
+        users.value = users.value.filter(u => u.wxId !== user.wxId);
+        ElMessage.success('用户删除成功!');
+      })
+      .catch(error => {
+        ElMessage.error('Error deleting user: ' + error);
       });
-    };
+  }).catch(() => {
+    ElMessage.info('已取消删除');
+  });
+};
 
     const saveChanges = () => {
-      users.value = users.value.map(u => u.userId === editingUser.value.userId ? editingUser.value : u);
-      saveData(editingUser.value.userId);
+      users.value = users.value.map(u => u.wxId === editingUser.value.wxId ? editingUser.value : u);
+      saveData();
       ElMessage.success('用户信息已更新');
       dialogVisible.value = false;
       
@@ -208,23 +210,24 @@ export default {
     const cancelAddUser = () => {
       dialogAddUser.value = false;
       Object.assign(editingUser, {
-        userId: '',
+        wxId: '',
         username: '',
-        oaAccount: '',
+        oaUsername: '',
         oaPassword: ''
       });
     };
     const addSaves = ()=>{
       dialogAddUser.value=false;
-      axios.post(`${API_BASE_URL}/api/users`, editingUser.value)
+      axios.post(`${API_BASE_URL}/api/log/user/save`, editingUser.value)
         .then(response => {
           console.log(response.data);
           dialogAddUser.value = false;
           // 清空表单
           Object.assign(editingUser.value, {
-            userId: '',
+            id:'',
+            wxId: '',
             username: '',
-            oaAccount: '',
+            oaUsername: '',
             oaPassword: ''
           });
           // 可以在这里处理成功后的逻辑，比如刷新数据等
@@ -240,7 +243,7 @@ export default {
 
 
     onMounted(() => {
-      fetchData(); // 初始化时加载数据
+
       
     });
 
