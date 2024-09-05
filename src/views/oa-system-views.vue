@@ -141,7 +141,7 @@ export default {
           ElMessage.error('Error fetching data: ' + error);
         });
     };
-   
+  
     const saveData = ()=>{
       axios.post(`${API_BASE_URL}/api/log/user/save`, editingUser.value)
         .then(() =>{
@@ -157,10 +157,8 @@ export default {
 
     const filteredUsers = computed(() => {
       return users.value.filter(user => {
-        // 检查 user.username 和 user.userId 是否存在
         const username = user.username || '';
         const userId = user.wxId || '';
-
         return (
           username.includes(searchUsername.value) &&
           userId.includes(searchUserID.value)
