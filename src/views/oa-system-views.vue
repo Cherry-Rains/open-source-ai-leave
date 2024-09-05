@@ -11,8 +11,8 @@
         <!-- <el-button @click="fetchData()"></el-button> -->
         <el-button type="primary" @click="showAddUser"><el-icon style="margin-right: 3px;"><Plus /></el-icon>新增用户</el-button>
       </div>
-      <div class="table-sys" style="flex: 1; display: flex; justify-content: center;">
-        <el-table :data="filteredUsers" ref="tableRef" style="width: 1210px; height: 500px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);" header-align="center" >
+      <div class="table-sys" style="flex: 1; display: flex; justify-content: center; width: 100%; padding-bottom: 20px; overflow-y: auto;">
+        <el-table :data="filteredUsers" ref="tableRef" style="width: 1210px; height: auto; max-height: calc(100vh - 160px); border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);" >
           <el-table-column prop="username" label="姓名" flex="1"></el-table-column>
           <el-table-column prop="userId" label="用户ID" flex="1"></el-table-column>
           <el-table-column prop="oaAccount" label="OA系统用户名" flex="1"></el-table-column>
@@ -284,9 +284,9 @@ export default {
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   margin: 20px;
-  overflow-y: hidden; 
+  overflow-y: auto; 
   background-color: rgba(255, 255, 255, 0.7); /* 半透明白色 */
-  min-height: calc(100vh - 40px); /* 减去上下外边距 */
+  height: calc(100vh - 40px); /* 减去上下外边距 */
 }
 .header {
   display: flex;
