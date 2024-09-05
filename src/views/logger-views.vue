@@ -11,8 +11,8 @@
           v-model="userId"
           clearable
         />
-      </div>
-      <div class="dateSelect" style="height: 5%;background-color: antiquewhite;">
+   
+      
         <el-date-picker
           id="start-time"
           v-model="startTime"
@@ -28,9 +28,9 @@
           clearable
         />
         <el-button @click="searchdb" :icon="Search">
-          查询111
+          查询
         </el-button>
-      </div>
+      
 
       <div class="DBcontainer" style="height: auto; background-color: aqua;">
         <el-table :data="paginatedData" style="width: 100%">
@@ -71,6 +71,7 @@
         <el-button @click="nextPage" :disabled="currentPage === totalPages">下一页</el-button>
       </div>
     </div>
+  </div>
   </div>
 </template>
 
