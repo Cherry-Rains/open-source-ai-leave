@@ -1,6 +1,6 @@
 <template>
    <transition name="el-zoom-in-top">
-  <div class="container" style="display: flex; flex-direction: column; height: 100vh;">
+  <div class="container" style="display: flex; flex-direction: column; height: 96vh;">
 
     <div class="header">
       <!-- 头部内容 -->
