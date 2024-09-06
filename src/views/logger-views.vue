@@ -35,7 +35,8 @@
           <el-table-column prop="id" label="对话Id" width="100px"></el-table-column>
           <el-table-column prop="username" label="用户名" width="100px"></el-table-column>
           <el-table-column prop="userId" label="用户ID" width="200px"></el-table-column>
-          <el-table-column prop="startTime" label="起始时间" width="250"></el-table-column>
+          <el-table-column prop="startTime" label="起始时间" width="250">
+          </el-table-column>
           <el-table-column prop="endTime" label="结束时间" width="250"></el-table-column>
           <el-table-column label="对话历史" width="200px">
             <template #default="scope">
@@ -76,7 +77,7 @@
 
 <script>
 import axios from 'axios';
-import { ref, computed } from 'vue';
+import { ref, computed,onMounted } from 'vue';
 import { ElMessage } from 'element-plus';
 import { Search } from '@element-plus/icons-vue';
 import { API_BASE_URL } from '@/config';
@@ -103,8 +104,14 @@ export default {
           const matchesUserName = !userNameValue || (item.username && item.username.toLowerCase().includes(userNameValue));
           const matchesStartTime = isNaN(startTimeValue.getTime()) || itemStartTime >= startTimeValue;
           const matchesEndTime = isNaN(endTimeValue.getTime()) || itemEndTime <= endTimeValue; 
-          return matchesUserName || matchesStartTime || matchesEndTime;
+          return matchesUserName || matchesStartTime|| matchesEndTime;
         });
+        
+      }
+    
+      )
+      .then(()=>{  
+        
       })
       .catch(error => ElMessage.error('Error fetching data: ' + error));
 };
@@ -131,7 +138,9 @@ export default {
     const setPage = page => {
       currentPage.value = page;
     };
-
+    onMounted(() => {
+      searchdb();
+    });
     return {
       userName,
       dialogVisible,
@@ -148,6 +157,7 @@ export default {
       displayedSessionId: '',
       displayedConversation: '',
     };
+
   },
   methods: {
     async showDialog(row) {
@@ -171,7 +181,8 @@ export default {
     handleConfirm() {
       this.dialogVisible = false;
     }
-  }
+  },
+
 };
 </script>
 
