@@ -48,9 +48,9 @@
       <el-dialog v-model="dialogVisible" title="对话日志" width="90%" append-to-body>
         <template v-if="displayedConversation">
           <div style="max-height: 480px; overflow-y: auto;">
-            <p v-for="(message, index) in displayedConversation" :key="index">
-              <small>{{ message.timestamp }}</small>
-              <br><strong>{{ message.role }}:</strong> {{ message.content }}
+            <p v-for="(message, index) in displayedConversation.data" :key="index">
+              <small>{{ new Date(message.time).toLocaleString()}}</small>
+              <br><strong>{{ message.role }}:</strong> {{message.content}}
             </p>
           </div>
         </template>
@@ -151,7 +151,7 @@ export default {
   },
   methods: {
     async showDialog(row) {
-      this.displayedSessionId = row.session_id;
+      this.displayedSessionId = row.id;
       try {
         this.displayedConversation = await this.fetchConversation(this.displayedSessionId);
         this.dialogVisible = true;
@@ -160,7 +160,7 @@ export default {
       }
     },
     fetchConversation(sessionId) {
-      return axios.get(`${API_BASE_URL}/conversation/${sessionId}`)
+      return axios.get(`${API_BASE_URL}/api/log/conversationMessage/list?conversationId=${sessionId}`)
         .then(response => {
           return response.data;
         })
